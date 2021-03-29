@@ -2,17 +2,14 @@ package com.cev.covid.domain;
 
 import java.time.LocalDate;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class Data {
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
 	private LocalDate date;
@@ -26,6 +23,19 @@ public class Data {
 	@ManyToOne
 	@JsonIgnoreProperties({"data"})
 	private Region region;
+
+	// TODO: grabar explicación
+	public Data() {}
+
+	public Data(LocalDate date, long confirmed, long deaths, long recovered, long active, double incidentRate, double caseFatalityRatio) {
+		this.date = date;
+		this.confirmed = confirmed;
+		this.deaths = deaths;
+		this.recovered = recovered;
+		this.active = active;
+		this.incidentRate = incidentRate;
+		this.caseFatalityRatio = caseFatalityRatio;
+	}
 	
 	public Region getRegion() {
 		return region;

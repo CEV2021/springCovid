@@ -22,8 +22,12 @@ public class RegionService {
 	public List<Region> getRegions(){
 		return regionRepository.findAll();
 	}
-	
-	public Optional<Region> getRegion(String name){
-		return regionRepository.findByName(name);
+
+    public Optional<Region> findByName(String regionName) {
+		return regionRepository.findByName(regionName);
+    }
+
+	public void save(Region region) {
+		regionRepository.save(region);
 	}
 }

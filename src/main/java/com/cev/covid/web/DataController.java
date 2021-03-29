@@ -3,6 +3,8 @@ package com.cev.covid.web;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +21,15 @@ public class DataController {
 	
 	@Autowired
 	private DataService dataService;
+
+    // TODO: grabar explicación
+	@EventListener(ApplicationReadyEvent.class)
+	public void parseDailyCovidData() {
+		if(dataService.parseData())
+			System.out.println("Covid data parsed correctly!");
+		else
+			System.out.println("An error occurred parsing the data!");
+	}
 
 	@PostMapping("data")
 	public Data postData(@RequestBody Data data) {

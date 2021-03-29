@@ -18,26 +18,17 @@ import com.cev.covid.web.errors.NotFoundException;
 @RestController
 @RequestMapping("/api")
 public class RegionController {
+
 	@Autowired
     private RegionService regionService;
-
-	@PostMapping("regions")
-	public Region postRegion(@RequestBody Region region) {
-		return regionService.postRegion(region);
-	}
 
 	@GetMapping("regions")
 	public List<Region> getRegions(){
 		return regionService.getRegions();
 	}
 	
-	@GetMapping("region/{name}")
-	public Region getRegionName(@PathVariable(name="name")String name) {
-		Optional<Region> result = regionService.getRegion(name);
-		if(result.isPresent()) {
-			return result.get();
-		}else {
-			throw new NotFoundException("La comunidad " + name + " no existe");
-		}
+	@GetMapping("regions/{name}")
+	public Region getRegionName(@PathVariable String name) {
+		return regionService.findByName(name).orElse(new Region());
 	}
 }
