@@ -22,7 +22,6 @@ public class DataController {
 	@Autowired
 	private DataService dataService;
 
-    // TODO: grabar explicación
 	@EventListener(ApplicationReadyEvent.class)
 	public void parseDailyCovidData() {
 		if(dataService.parseData())

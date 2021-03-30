@@ -24,7 +24,6 @@ public class Data {
 	@JsonIgnoreProperties({"data"})
 	private Region region;
 
-	// TODO: grabar explicación
 	public Data() {}
 
 	public Data(LocalDate date, long confirmed, long deaths, long recovered, long active, double incidentRate, double caseFatalityRatio) {

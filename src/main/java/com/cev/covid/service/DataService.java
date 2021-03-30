@@ -39,7 +39,6 @@ public class DataService {
 		return dataRepository.findByRegion_Name(name);
 	}
 
-	// TODO: grabar explicación
 	private CSVRecord csvRecord;
 	private String yesterdaysFileName;
 

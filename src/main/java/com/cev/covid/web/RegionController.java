@@ -22,12 +22,12 @@ public class RegionController {
 	@Autowired
     private RegionService regionService;
 
-	@GetMapping("regions")
+	@GetMapping("/regions")
 	public List<Region> getRegions(){
 		return regionService.getRegions();
 	}
 	
-	@GetMapping("regions/{name}")
+	@GetMapping("/regions/{name}")
 	public Region getRegionName(@PathVariable String name) {
 		return regionService.findByName(name).orElse(new Region());
 	}
