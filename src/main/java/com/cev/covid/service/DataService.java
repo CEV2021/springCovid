@@ -102,4 +102,10 @@ public class DataService {
 		String record = csvRecord.get(header);
 		return record.isEmpty() ? "0" : record;
 	}
+
+	public Data findYesterdaysTotalNumbers() {
+		System.out.println("ataRepository.findYesterdaysTotalNumbers().orElse(new Data() = " + dataRepository.findYesterdaysTotalNumbers().orElse(new Data()));
+		final var data = dataRepository.findYesterdaysTotalNumbers().orElse(new Data());
+		return data;
+	}
 }
