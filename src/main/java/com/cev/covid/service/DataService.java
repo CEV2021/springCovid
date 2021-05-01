@@ -40,54 +40,59 @@ public class DataService {
 	}
 
 	private CSVRecord csvRecord;
-	private String yesterdaysFileName;
+	private String fileName;
 
-	public boolean parseData() {
-
+	public boolean parseData(LocalDate date) {
 		// If date already exists in repo return false and don't parse
-		if (dataRepository.findFirstByDate(LocalDate.now().minusDays(1)).isPresent())
+		if (dataRepository.findFirstByDate(date).isPresent())
 			return false;
 
-		Region region;
+		updateFileName(date);
 
-		updateYesterdaysFileName();
-
-		CompletableFuture<Boolean> fileDownload = CompletableFuture.supplyAsync(() -> downloadYesterdaysFile(yesterdaysFileName));
+		CompletableFuture<Boolean> fileDownload = CompletableFuture.supplyAsync(() -> downloadCsvFile(fileName));
 		while (!fileDownload.isDone())
 			System.out.print("Downloading file... ");
 
-		try (Reader in = new FileReader("./covid_19_daily_reports/" + yesterdaysFileName)) {
+		try (Reader in = new FileReader("./covid_19_daily_reports/" + fileName)) {
 			Iterable<CSVRecord> records = CSVFormat.DEFAULT.withHeader().parse(in);
 			for (CSVRecord record : records) {
 				csvRecord = record;
 				if (record.get("Country_Region").equals("Spain") && !record.get("Province_State").equals("Unknown")) {
 					String regionName = record.get("Province_State");
-					long confirmed = Long.parseLong(getRecordValueOrElseZero("Confirmed"));
-					long deaths = Long.parseLong(getRecordValueOrElseZero("Deaths"));
-					long recovered = Long.parseLong(getRecordValueOrElseZero("Recovered"));
-					long active = Long.parseLong(getRecordValueOrElseZero("Active"));
-					double incidentRate = Double.parseDouble(getRecordValueOrElseZero("Incident_Rate"));
-					double caseFatalityRatio = Double.parseDouble(getRecordValueOrElseZero("Case_Fatality_Ratio"));
+					final var confirmed = Long.parseLong(getRecordValueOrElseZero("Confirmed"));
+					final var deaths = Long.parseLong(getRecordValueOrElseZero("Deaths"));
+					final var recovered = Long.parseLong(getRecordValueOrElseZero("Recovered"));
+					final var active = Long.parseLong(getRecordValueOrElseZero("Active"));
+					final var incidentRate = Double.parseDouble(getRecordValueOrElseZero("Incident_Rate"));
+					final var caseFatalityRatio = Double.parseDouble(getRecordValueOrElseZero("Case_Fatality_Ratio"));
 					// Instantiate current record
-					Data currentRecord = new Data(LocalDate.now().minusDays(1), confirmed, deaths, recovered, active, incidentRate, caseFatalityRatio);
+					final var currentRecord = new Data(LocalDate.now().minusDays(1), confirmed, deaths, recovered, active, incidentRate, caseFatalityRatio);
 					// If subregion exists get it from repo, otherwise create it
-					region = regionService.findByName(regionName).orElse(new Region(regionName));
+					var region = regionService.findByName(regionName).orElse(new Region(regionName));
 					regionService.save(region);
 					currentRecord.setRegion(region);
 					dataRepository.save(currentRecord);
 				}
 			}
+			updateSpainTotalNumbers(date);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return true;
 	}
 
-	private void updateYesterdaysFileName() {
-		yesterdaysFileName = DateTimeFormatter.ofPattern("MM-dd-yyyy").format(LocalDate.now().minusDays(1)) + ".csv";
+	private void updateSpainTotalNumbers(LocalDate date) {
+		final var spainTotalNumbers = findSpainTotalNumbers(date);
+		final var region = regionService.findByName("Spain").get();
+		spainTotalNumbers.setRegion(region);
+		dataRepository.save(spainTotalNumbers);
 	}
 
-	private Boolean downloadYesterdaysFile(String fileName) {
+	private void updateFileName(LocalDate date) {
+		fileName = DateTimeFormatter.ofPattern("MM-dd-yyyy").format(date) + ".csv";
+	}
+
+	private Boolean downloadCsvFile(String fileName) {
 		try {
 			FileUtils.copyURLToFile(new URL("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/" + fileName),
 					new File("./covid_19_daily_reports/" + fileName));
@@ -99,13 +104,11 @@ public class DataService {
 	}
 
 	private String getRecordValueOrElseZero(String header) {
-		String record = csvRecord.get(header);
+		final var record = csvRecord.get(header);
 		return record.isEmpty() ? "0" : record;
 	}
 
-	public Data findYesterdaysTotalNumbers() {
-		System.out.println("ataRepository.findYesterdaysTotalNumbers().orElse(new Data() = " + dataRepository.findYesterdaysTotalNumbers().orElse(new Data()));
-		final var data = dataRepository.findYesterdaysTotalNumbers().orElse(new Data());
-		return data;
+	public Data findSpainTotalNumbers(LocalDate date) {
+		return dataRepository.findYesterdaysTotalNumbers(date).orElse(new Data());
 	}
 }

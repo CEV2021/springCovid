@@ -29,11 +29,4 @@ public class RegionController {
 	public Region getRegionName(@PathVariable String name) {
 		return regionService.findByName(name).orElse(new Region());
 	}
-
-	@GetMapping("/regions/spain")
-	public Region getYesterdayTotalNumbers() {
-		final var spainOpt = regionService.findByName("Spain");
-		spainOpt.ifPresent(region -> region.getData().add(dataService.findYesterdaysTotalNumbers()));
-		return spainOpt.orElse(new Region());
-	}
 }

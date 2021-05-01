@@ -1,13 +1,12 @@
 package com.cev.covid.service;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.cev.covid.domain.Region;
+import com.cev.covid.repository.RegionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.cev.covid.domain.Region;
-import com.cev.covid.repository.RegionRepository;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RegionService {
