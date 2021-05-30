@@ -108,7 +108,7 @@ public class DataService {
 		return record.isEmpty() ? "0" : record;
 	}
 
-	public Data findSpainTotalNumbers(LocalDate date) {
+	private Data findSpainTotalNumbers(LocalDate date) {
 		return dataRepository.findYesterdaysTotalNumbers(date).orElse(new Data());
 	}
 }
